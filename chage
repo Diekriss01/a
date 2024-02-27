@@ -5,10 +5,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 
 #define COIN_SENSOR_PIN A0
 
-int count_1BATH = 0;
-int count_2BATH = 0;
-int count_5BATH = 0;
-int count_10BATH = 0;
+int coinCount = 0;
 
 void intro() {
   lcd.setCursor(2, 0);
@@ -22,31 +19,19 @@ void setup() {
   lcd.backlight();
   intro();
   lcd.setCursor(0, 0);
-  lcd.print("1  2  5  10THB");
+  lcd.print("Coins detected:");
 }
 
 void loop() {
   int sensorValue = analogRead(COIN_SENSOR_PIN);
 
   // Placeholder for coin detection logic
-  if (sensorValue > 100 && sensorValue < 300) {
-    count_1BATH++;
-  } else if (sensorValue >= 300 && sensorValue < 500) {
-    count_2BATH++;
-  } else if (sensorValue >= 500 && sensorValue < 700) {
-    count_5BATH++;
-  } else if (sensorValue >= 700 && sensorValue < 900) {
-    count_10BATH++;
+  if (sensorValue > 100) {
+    coinCount++;
   }
 
   lcd.setCursor(0, 1);
-  lcd.print(count_1BATH);
-  lcd.setCursor(3, 1);
-  lcd.print(count_2BATH);
-  lcd.setCursor(7, 1);
-  lcd.print(count_5BATH);
-  lcd.setCursor(11, 1);
-  lcd.print(count_10BATH);
+  lcd.print(coinCount);
 
   delay(100);  // Adjust delay as needed
 }
