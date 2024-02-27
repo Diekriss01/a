@@ -13,7 +13,7 @@ void setup() {
 }
 
 void loop() {
-  int coinCount = digitalRead(COIN_COUNTER_PIN); // Read count from coin counter
+  int coinCount = digitalRead(COIN_COUNTER_PIN); // Read count from coin counter pin
 
   lcd.setCursor(0, 1);
   lcd.print(coinCount);
