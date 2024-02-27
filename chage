@@ -2,33 +2,18 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
-
-#define COIN_SENSOR_PIN A0
-
-int coinCount = 0;
-
-void intro() {
-  lcd.setCursor(2, 0);
-  lcd.print("COIN SORTING");
-  delay(2000);
-  lcd.clear();
-}
+#define COIN_COUNTER_PIN 2 // Assuming the coin counter output is connected to digital pin 2
 
 void setup() {
   lcd.init();
   lcd.backlight();
-  intro();
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
+  pinMode(COIN_COUNTER_PIN, INPUT); // Set coin counter pin as input
 }
 
 void loop() {
-  int sensorValue = analogRead(COIN_SENSOR_PIN);
-
-  // Placeholder for coin detection logic
-  if (sensorValue > 100) {
-    coinCount++;
-  }
+  int coinCount = digitalRead(COIN_COUNTER_PIN); // Read count from coin counter
 
   lcd.setCursor(0, 1);
   lcd.print(coinCount);
