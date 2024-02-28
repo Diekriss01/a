@@ -20,10 +20,10 @@ void setup() {
 
 void loop() {
   // Check if a coin is dropped
-  if (!coinDetected && digitalRead(coinDropPin) == LOW) {
+  if (!coinDetected && digitalRead(coinDropPin) == HIGH) {
     coinDetected = true; // Set coin detected flag
 
-    // Update the coin count
+    // Increment the coin count
     coinCount++;
 
     // Update the LCD display with the coin count
@@ -31,8 +31,12 @@ void loop() {
     lcd.print("          "); // Clear the previous count
     lcd.setCursor(0, 1);
     lcd.print(coinCount);
-  } else if (coinDetected && digitalRead(coinDropPin) == HIGH) {
+  } else if (coinDetected && digitalRead(coinDropPin) == LOW) {
     coinDetected = false; // Reset coin detected flag when coin is no longer detected
+
+    // Display message indicating readiness to detect coins
+    lcd.setCursor(0, 1);
+    lcd.print("Ready for coins    ");
   }
 
   // Debug output
