@@ -3,9 +3,7 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 
-const unsigned long coinInterval = 5000;  // Interval between counting coins (in milliseconds)
 const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor from IC510T TB510
-unsigned long lastCoinTime = 0; // Variable to store the time of the last counted coin
 int coinCount = 0; // Counter for the number of coins
 bool coinDetected = false; // Flag to indicate if a coin has been detected
 
@@ -17,28 +15,30 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print("Ready for coins"); // Display message indicating readiness to detect coins
   pinMode(coinDropPin, INPUT_PULLUP); // Set coin drop pin as input with internal pull-up resistor
+  Serial.begin(9600); // Initialize serial communication
 }
 
 void loop() {
-  unsigned long currentTime = millis(); // Get the current time
-
   // Check if a coin is dropped
   if (!coinDetected && digitalRead(coinDropPin) == LOW) {
-    delay(50); // Debounce delay
-    if (digitalRead(coinDropPin) == LOW && (currentTime - lastCoinTime >= coinInterval)) {
-      coinCount++; // Increment the coin count
-      lastCoinTime = currentTime; // Update the last coin time
-      coinDetected = true; // Set coin detected flag
+    coinDetected = true; // Set coin detected flag
 
-      // Update the LCD display with the coin count
-      lcd.setCursor(0, 1);
-      lcd.print("          "); // Clear the previous count
-      lcd.setCursor(0, 1);
-      lcd.print(coinCount);
-    }
-  } else if (digitalRead(coinDropPin) == HIGH) {
+    // Update the coin count
+    coinCount++;
+
+    // Update the LCD display with the coin count
+    lcd.setCursor(0, 1);
+    lcd.print("          "); // Clear the previous count
+    lcd.setCursor(0, 1);
+    lcd.print(coinCount);
+  } else if (coinDetected && digitalRead(coinDropPin) == HIGH) {
     coinDetected = false; // Reset coin detected flag when coin is no longer detected
   }
 
+  // Debug output
+  Serial.print("Coin Drop Pin: ");
+  Serial.println(digitalRead(coinDropPin));
+
   // Add any other operations or delays here
+  delay(1000); // Delay to avoid flooding the Serial Monitor
 }
