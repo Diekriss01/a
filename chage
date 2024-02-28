@@ -1,40 +1,46 @@
 #include <Wire.h>
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // Adjust pin numbers if necessary
+LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD address: 0x27, 16 columns, 2 rows
 
-const byte coinDropPin = 7; // Digital pin connected to the coin drop sensor from IC510T TB510
+const byte coinSensorPin = 2; // Digital pin connected to the coin sensor
 int coinCount = 0; // Counter for the number of coins
-bool lastState = true; // Variable to store the previous state of the coin drop pin
 
 void setup() {
-  lcd.begin(16, 2); // Initialize the LCD
+  lcd.init(); // Initialize the LCD
+  lcd.backlight(); // Turn on the backlight
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
-  lcd.setCursor(0, 1);
-  lcd.print("Ready for coins"); // Display message indicating readiness to detect coins
-  pinMode(coinDropPin, INPUT_PULLUP); // Set coin drop pin as input with internal pull-up resistor
+  updateLCD(); // Display initial coin count
+  pinMode(coinSensorPin, INPUT_PULLUP); // Set coin sensor pin as input with internal pull-up resistor
   Serial.begin(9600); // Initialize serial communication
 }
 
 void loop() {
-  bool currentState = digitalRead(coinDropPin); // Get the current state of the coin drop pin
-
-  // Check if the current state is different from the previous state
-  if (currentState != lastState) {
-    // If the current state is HIGH, a coin is detected
-    if (currentState == LOW) {
+  // Check for coin sensor input
+  if (digitalRead(coinSensorPin) == LOW) {
+    delay(50); // Debounce delay
+    if (digitalRead(coinSensorPin) == LOW) {
       coinCount++; // Increment the coin count
-      lcd.setCursor(0, 1);
-      lcd.print("          "); // Clear the previous count
-      lcd.setCursor(0, 1);
-      lcd.print(coinCount); // Update the LCD display with the new coin count
-    } else { // If the current state is LOW, the coin is removed
-      lcd.setCursor(0, 1);
-      lcd.print("Ready for coins    "); // Display message indicating readiness to detect coins
+      updateLCD(); // Update the LCD display with the new coin count
     }
-    delay(50); // Debounce delay to avoid false triggers
   }
 
-  lastState = currentState; // Update the last state with the current state
+  // Check for serial input
+  if (Serial.available() > 0) {
+    char input = Serial.read();
+    if (input == 'c') {
+      coinCount++; // Increment the coin count
+      updateLCD(); // Update the LCD display with the new coin count
+    }
+  }
+
+  // Add any other operations or delays here
+}
+
+void updateLCD() {
+  lcd.setCursor(0, 1);
+  lcd.print("          "); // Clear the previous count
+  lcd.setCursor(0, 1);
+  lcd.print(coinCount); // Update the LCD display with the new coin count
 }
