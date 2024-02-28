@@ -1,21 +1,21 @@
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // Adjust pin numbers if necessary
 
-const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor from IC510T TB510
+const byte coinDropPin = 7; // Digital pin connected to the coin drop sensor from IC510T TB510
 int coinCount = 0; // Counter for the number of coins
 bool coinDetected = false; // Flag to indicate if a coin has been detected
 bool lastState = true; // Variable to store the previous state of the coin drop pin
 
 void setup() {
-  lcd.init(); // Initialize the LCD
-  lcd.backlight(); // Turn on the backlight
+  lcd.begin(16, 2); // Initialize the LCD
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
   lcd.setCursor(0, 1);
   lcd.print("Ready for coins"); // Display message indicating readiness to detect coins
-  pinMode(coinDropPin, INPUT_PULLUP); // Set coin drop pin as input with internal pull-up resistor
+  pinMode(coinDropPin, INPUT); // Set coin drop pin as input
+  digitalWrite(coinDropPin, HIGH); // Activate external pull-up resistor
   Serial.begin(9600); // Initialize serial communication
 }
 
