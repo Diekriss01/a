@@ -3,8 +3,8 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 
-#define COIN_COUNT_INTERVAL_MS 1000 // Assuming each coin takes 1 second to count
-
+unsigned long lastCoinTime = 0; // Variable to store the time of the last counted coin
+unsigned long coinInterval = 5000; // Interval between counting coins (in milliseconds)
 int coinCount = 0; // Counter for the number of coins
 
 void setup() {
@@ -15,11 +15,17 @@ void setup() {
 }
 
 void loop() {
-  // Simulate counting a coin every COIN_COUNT_INTERVAL_MS milliseconds
-  delay(COIN_COUNT_INTERVAL_MS);
-  coinCount++;
-  
-  // Update the LCD display
+  unsigned long currentTime = millis(); // Get the current time
+
+  // Check if it's time to count a coin based on the interval
+  if (currentTime - lastCoinTime >= coinInterval) {
+    coinCount++; // Increment the coin count
+    lastCoinTime = currentTime; // Update the last coin time
+  }
+
+  // Update the LCD display with the coin count
   lcd.setCursor(0, 1);
   lcd.print(coinCount);
+
+  // Add any other operations or delays here
 }
