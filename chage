@@ -4,7 +4,7 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 
 const unsigned long coinInterval = 5000;  // Interval between counting coins (in milliseconds)
-const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor
+const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor from IC510T TB510
 unsigned long lastCoinTime = 0; // Variable to store the time of the last counted coin
 int coinCount = 0; // Counter for the number of coins
 
@@ -14,26 +14,23 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
   lcd.setCursor(0, 1);
-  lcd.print("0"); // Initialize the count to zero
-  pinMode(coinDropPin, INPUT_PULLUP); // Set coin drop pin as input with internal pull-up resistor
+  lcd.print("Ready for coins"); // Display message indicating readiness to detect coins
+  pinMode(coinDropPin, INPUT); // Set coin drop pin as input
 }
 
 void loop() {
   unsigned long currentTime = millis(); // Get the current time
 
   // Check if a coin is dropped
-  if (digitalRead(coinDropPin) == LOW) {
-    delay(50); // Debounce delay
-    if (digitalRead(coinDropPin) == LOW && (currentTime - lastCoinTime >= coinInterval)) {
-      coinCount++; // Increment the coin count
-      lastCoinTime = currentTime; // Update the last coin time
+  if (digitalRead(coinDropPin) == LOW && (currentTime - lastCoinTime >= coinInterval)) {
+    coinCount++; // Increment the coin count
+    lastCoinTime = currentTime; // Update the last coin time
 
-      // Update the LCD display with the coin count
-      lcd.setCursor(0, 1);
-      lcd.print("          "); // Clear the previous count
-      lcd.setCursor(0, 1);
-      lcd.print(coinCount);
-    }
+    // Update the LCD display with the coin count
+    lcd.setCursor(0, 1);
+    lcd.print("          "); // Clear the previous count
+    lcd.setCursor(0, 1);
+    lcd.print(coinCount);
   }
 
   // Add any other operations or delays here
