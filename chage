@@ -23,6 +23,7 @@ void loop() {
     if (digitalRead(coinSensorPin) == LOW) {
       coinCount++; // Increment the coin count
       updateLCD(); // Update the LCD display with the new coin count
+      while (digitalRead(coinSensorPin) == LOW) {} // Wait until coin sensor is no longer triggered
     }
   }
 
