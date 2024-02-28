@@ -2,21 +2,24 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
-#define COIN_COUNTER_PIN 2 // Assuming the coin counter output is connected to digital pin 2
+
+#define COIN_COUNT_INTERVAL_MS 1000 // Assuming each coin takes 1 second to count
+
+int coinCount = 0; // Counter for the number of coins
 
 void setup() {
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
-  pinMode(COIN_COUNTER_PIN, INPUT); // Set coin counter pin as input
 }
 
 void loop() {
-  int coinCount = digitalRead(COIN_COUNTER_PIN); // Read count from coin counter pin
-
+  // Simulate counting a coin every COIN_COUNT_INTERVAL_MS milliseconds
+  delay(COIN_COUNT_INTERVAL_MS);
+  coinCount++;
+  
+  // Update the LCD display
   lcd.setCursor(0, 1);
   lcd.print(coinCount);
-
-  delay(100);  // Adjust delay as needed
 }
