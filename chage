@@ -3,32 +3,37 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 
-unsigned long lastCoinTime = 0;     // Variable to store the time of the last counted coin
-unsigned long coinInterval = 5000;  // Interval between counting coins (in milliseconds)
-int coinCount = 0;                   // Counter for the number of coins
+const unsigned long coinInterval = 5000;  // Interval between counting coins (in milliseconds)
+const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor
+unsigned long lastCoinTime = 0; // Variable to store the time of the last counted coin
+int coinCount = 0; // Counter for the number of coins
 
 void setup() {
-  lcd.init();                         // Initialize the LCD
-  lcd.backlight();                    // Turn on the backlight
+  lcd.init(); // Initialize the LCD
+  lcd.backlight(); // Turn on the backlight
   lcd.setCursor(0, 0);
   lcd.print("Coins detected:");
   lcd.setCursor(0, 1);
-  lcd.print("0");                     // Initialize the count to zero
+  lcd.print("0"); // Initialize the count to zero
+  pinMode(coinDropPin, INPUT_PULLUP); // Set coin drop pin as input with internal pull-up resistor
 }
 
 void loop() {
   unsigned long currentTime = millis(); // Get the current time
 
-  // Check if it's time to count a coin based on the interval
-  if (currentTime - lastCoinTime >= coinInterval) {
-    coinCount++; // Increment the coin count
-    lastCoinTime = currentTime; // Update the last coin time
+  // Check if a coin is dropped
+  if (digitalRead(coinDropPin) == LOW) {
+    delay(50); // Debounce delay
+    if (digitalRead(coinDropPin) == LOW && (currentTime - lastCoinTime >= coinInterval)) {
+      coinCount++; // Increment the coin count
+      lastCoinTime = currentTime; // Update the last coin time
 
-    // Update the LCD display with the coin count
-    lcd.setCursor(0, 1);
-    lcd.print("          ");    // Clear the previous count
-    lcd.setCursor(0, 1);
-    lcd.print(coinCount);
+      // Update the LCD display with the coin count
+      lcd.setCursor(0, 1);
+      lcd.print("          "); // Clear the previous count
+      lcd.setCursor(0, 1);
+      lcd.print(coinCount);
+    }
   }
 
   // Add any other operations or delays here
