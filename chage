@@ -6,6 +6,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); // Adjust the address if necessary
 const byte coinDropPin = 2; // Digital pin connected to the coin drop sensor from IC510T TB510
 int coinCount = 0; // Counter for the number of coins
 bool coinDetected = false; // Flag to indicate if a coin has been detected
+bool lastState = LOW; // Variable to store the previous state of the coin drop pin
 
 void setup() {
   lcd.init(); // Initialize the LCD
@@ -19,20 +20,22 @@ void setup() {
 }
 
 void loop() {
-  // Check if a coin is dropped
-  if (!coinDetected && digitalRead(coinDropPin) == HIGH) {
-    coinDetected = true; // Set coin detected flag
+  // Read the current state of the coin drop pin
+  bool currentState = digitalRead(coinDropPin);
 
-    // Increment the coin count
-    coinCount++;
+  // Check if the state has changed and the current state is HIGH (coin is detected)
+  if (currentState == HIGH && lastState == LOW) {
+    coinCount++; // Increment the coin count
+    lastState = currentState; // Update the last state
+    coinDetected = true; // Set coin detected flag
 
     // Update the LCD display with the coin count
     lcd.setCursor(0, 1);
     lcd.print("          "); // Clear the previous count
     lcd.setCursor(0, 1);
     lcd.print(coinCount);
-  } else if (coinDetected && digitalRead(coinDropPin) == LOW) {
-    coinDetected = false; // Reset coin detected flag when coin is no longer detected
+  } else if (currentState == LOW && lastState == HIGH) {
+    lastState = currentState; // Update the last state
 
     // Display message indicating readiness to detect coins
     lcd.setCursor(0, 1);
@@ -41,7 +44,7 @@ void loop() {
 
   // Debug output
   Serial.print("Coin Drop Pin: ");
-  Serial.println(digitalRead(coinDropPin));
+  Serial.println(currentState);
 
   // Add any other operations or delays here
   delay(1000); // Delay to avoid flooding the Serial Monitor
