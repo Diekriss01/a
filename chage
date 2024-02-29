@@ -1,34 +1,101 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-LiquidCrystal_I2C lcd(0x27, 16, 2); // Address 0x27, 16 columns and 2 rows
-int coinCount = 0;
+// Define pin numbers for sensors
+int pinSensor_1 = 13;
+int pinSensor_2 = 12;
+int pinSensor_3 = 11;
+int pinSensor_4 = 10;
+
+// Variables to store sensor states
+int state_Sensor_1 = 0;
+int state_Sensor_2 = 0;
+int state_Sensor_3 = 0;
+int state_Sensor_4 = 0;
+
+// Variables to store coin counts
+int coin_1 = 0;
+int coin_2 = 0;
+int coin_5 = 0;
+int coin_10 = 0;
+
+// Variables to track coin detection state
+int coinDetected_1 = 0;
+int coinDetected_2 = 0;
+int coinDetected_3 = 0;
+int coinDetected_4 = 0;
 
 void setup() {
-  lcd.init(); // Initialize the LCD
-  lcd.backlight(); // Turn on backlight
-  lcd.clear(); // Clear the LCD screen
-  lcd.setCursor(0, 0);
-  lcd.print("Coin Counter");
+  Serial.begin(9600);
+  Serial.println("Micro Projects TH");
+
+  pinMode(pinSensor_1, INPUT);
+  pinMode(pinSensor_2, INPUT);
+  pinMode(pinSensor_3, INPUT);
+  pinMode(pinSensor_4, INPUT);
+
+  lcd.begin();
+  lcd.print("Hello");
   lcd.setCursor(0, 1);
-  lcd.print("Count: ");
-  
-  pinMode(2, INPUT_PULLUP); // Assuming coin counter input is connected to digital pin 2
-  attachInterrupt(digitalPinToInterrupt(2), countCoin, FALLING); // Attach interrupt for coin counting
+  lcd.print("Micro Project TH");
+  delay(1000);
+  lcd.clear();
 }
 
 void loop() {
-  // Main loop, nothing to do here as we are using interrupts for counting
-}
+  // Read sensor states
+  state_Sensor_1 = digitalRead(pinSensor_1);
+  state_Sensor_2 = digitalRead(pinSensor_2);
+  state_Sensor_3 = digitalRead(pinSensor_3);
+  state_Sensor_4 = digitalRead(pinSensor_4);
 
-void countCoin() {
-  coinCount++; // Increment coin count
-  updateLCD(); // Update the LCD display
-}
+  // Coin detection logic for sensor 1 (coin_1)
+  if (state_Sensor_1 == HIGH && coinDetected_1 == 0) {
+    coin_1++;
+    coinDetected_1 = 1;
+  } else if (state_Sensor_1 == LOW) {
+    coinDetected_1 = 0;
+  }
 
-void updateLCD() {
-  lcd.setCursor(7, 1); // Set cursor to the position where count is displayed
-  lcd.print("     "); // Clear previous count display
-  lcd.setCursor(7, 1); // Reset cursor position
-  lcd.print(coinCount); // Print updated coin count
+  // Coin detection logic for sensor 2 (coin_2)
+  if (state_Sensor_2 == HIGH && coinDetected_2 == 0) {
+    coin_2++;
+    coinDetected_2 = 1;
+  } else if (state_Sensor_2 == LOW) {
+    coinDetected_2 = 0;
+  }
+
+  // Coin detection logic for sensor 3 (coin_5)
+  if (state_Sensor_3 == HIGH && coinDetected_3 == 0) {
+    coin_5++;
+    coinDetected_3 = 1;
+  } else if (state_Sensor_3 == LOW) {
+    coinDetected_3 = 0;
+  }
+
+  // Coin detection logic for sensor 4 (coin_10)
+  if (state_Sensor_4 == HIGH && coinDetected_4 == 0) {
+    coin_10++;
+    coinDetected_4 = 1;
+  } else if (state_Sensor_4 == LOW) {
+    coinDetected_4 = 0;
+  }
+
+  // Update LCD display with coin counts
+  lcd.setCursor(0, 0);
+  lcd.print("c_1 : ");
+  lcd.print(coin_1);
+
+  lcd.setCursor(9, 0);
+  lcd.print("c_2 : ");
+  lcd.print(coin_2);
+
+  lcd.setCursor(0, 1);
+  lcd.print("c_5 : ");
+  lcd.print(coin_5);
+
+  lcd.setCursor(9, 1);
+  lcd.print("c_10: ");
+  lcd.print(coin_10);
 }
